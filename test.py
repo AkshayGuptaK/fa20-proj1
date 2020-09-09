@@ -4,6 +4,7 @@ import shutil
 import argparse
 import subprocess
 
+has_alternate_solutions = {'q2iii'}
 sqlite = "sqlite3"
 defaultdb = "lahman.db"
 # If you're on windows/older versions of mac we'll use
@@ -65,7 +66,7 @@ def remake_dir(path):
             os.remove(path)
     os.mkdir(path)
 
-def test_query(query, test_name, expected_output, data):
+def test_query(query, test_name, expected_output, data, has_alt=False):
     your_output_path = os.path.join("your_output", "{}.txt".format(test_name))
     expected_output_path = os.path.join(expected_output, "{}.txt".format(test_name))
     diff_path = os.path.join("diffs", "{}.txt".format(test_name))
@@ -81,7 +82,12 @@ def test_query(query, test_name, expected_output, data):
         subprocess.run([sqlite, data, "-header", "-list", query], stdout=f)
 
     if not make_diff(expected_output_path, your_output_path, diff_path):
-        print("FAIL {} see diffs/{}.txt".format(test_name, test_name))
+        if has_alt:
+            alt_result = test_query(query, test_name + '-alt', expected_output, data, has_alt=False)
+            if alt_result:
+                return True
+        if 'alt' not in test_name:
+            print("FAIL {} see diffs/{}.txt".format(test_name, test_name))
         return False
     else:
         print("PASS {}".format(test_name))
@@ -115,7 +121,7 @@ if __name__ == '__main__':
         elif args.question not in ('all', test_name, test_name[1:]):
             continue
         ran_any = True
-        result = test_query(query, test_name, args.expected, args.data)
+        result = test_query(query, test_name, args.expected, args.data, test_name in has_alternate_solutions)
         passed &= result
         if not result and args.question != 'all':
             print("Query used: `{}`".format(query))
