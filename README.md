@@ -1,3 +1,3 @@
-# Project 1: SQL
+# CS 186 Project 1: SQL
 
-This project is due on **Thursday, 9/10/2020 at 11:59PM PDT (GMT-7)**. Follow the instructions [here](https://cs186.gitbook.io/project/assignments/proj1) to get started.
+SQL query questions using a common baseball statistics database.
